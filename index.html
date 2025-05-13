@@ -1,324 +1,71 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>점심 메뉴 룰렛</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <style>
-        body {
-            font-family: 'Nanum Gothic', 'Malgun Gothic', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            color: #333;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점심메뉴 추천</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon.png">
+  <meta name="theme-color" content="#FFA500">
 
-        .app-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px; /* 최대 너비 설정 */
-        }
+  <!-- 오픈그래프 -->
+  <meta property="og:title" content="점심메뉴 추천" />
+  <meta property="og:description" content="오늘 뭐 먹지? 점심메뉴 룰렛으로 간편하게 결정하세요!" />
+  <meta property="og:image" content="og_image.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://jangjoYoon.github.io/lunch/" />
 
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 25px;
-        }
-
-        .roulette-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 25px;
-            width: 100%; /* 부모 너비에 맞춤 */
-        }
-
-        .roulette-container {
-            position: relative;
-            width: 320px; /* 캔버스 크기에 맞춤 또는 반응형으로 조정 */
-            height: 320px; /* 캔버스 크기에 맞춤 */
-        }
-
-        #rouletteCanvas {
-            display: block; /* 가운데 정렬 및 여백 제거 */
-            border-radius: 50%;
-            /* box-shadow: 0 0 15px rgba(0,0,0,0.2); */
-        }
-
-        .pointer {
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #e74c3c; /* 포인터 색상 */
-            position: absolute;
-            top: -10px; /* 캔버스 상단에 위치하도록 조정 */
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-        }
-
-        .spin-button {
-            background: linear-gradient(145deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 50px; /* 둥근 버튼 */
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .spin-button:hover {
-            background: linear-gradient(145deg, #2980b9, #3498db);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .spin-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .spin-button:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .result-display {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-radius: 10px;
-            min-height: 50px; /* 결과 표시 영역 높이 고정 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* 모바일 반응형 스타일 */
-        @media (max-width: 480px) {
-            .app-container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            .roulette-container {
-                width: 280px; /* 모바일에서 캔버스 크기 약간 줄임 */
-                height: 280px;
-            }
-            #rouletteCanvas {
-                 width: 280px !important; /* JS에서 설정된 크기 덮어쓰기 */
-                 height: 280px !important;
-            }
-            .spin-button {
-                padding: 12px 25px;
-                font-size: 1.1em;
-            }
-            .result-display {
-                font-size: 1.3em;
-            }
-        }
-    </style>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #fff3e0; padding: 20px; }
+    h1 { color: #ff5722; }
+    button { background: #ff9800; border: none; padding: 10px 20px; color: white; font-size: 1.2em; cursor: pointer; border-radius: 8px; }
+    #result { margin-top: 20px; font-size: 1.5em; font-weight: bold; color: #3e2723; }
+  </style>
 </head>
 <body>
-    <div class="app-container">
-        <h1>점심 메뉴 룰렛</h1>
-        <div class="roulette-wrapper">
-            <div class="roulette-container">
-                <canvas id="rouletteCanvas"></canvas>
-                <div class="pointer"></div>
-            </div>
-        </div>
-        <button id="spinButton" class="spin-button">오늘 뭐 먹지?</button>
-        <div id="resultDisplay" class="result-display">룰렛을 돌려주세요!</div>
-    </div>
+  <h1>점심 메뉴 룰렛</h1>
+  <canvas id="roulette" width="300" height="300"></canvas>
+  <br><br>
+  <button onclick="spin()">오늘 뭐 먹지?</button>
+  <div id="result">오늘의 메뉴:</div>
 
-    <script>
-        const canvas = document.getElementById('rouletteCanvas');
-        const ctx = canvas.getContext('2d');
-        const spinButton = document.getElementById('spinButton');
-        const resultDisplay = document.getElementById('resultDisplay');
+  <script>
+    const items = ["김치찌개", "돈까스", "햄버거", "샌드위치", "냉면", "칼국수", "부대찌개", "초밥", "짬뽕", "된장국", "비빔밥", "쌀국수"];
+    const canvas = document.getElementById("roulette");
+    const ctx = canvas.getContext("2d");
+    const radius = canvas.width / 2;
+    const angleStep = (2 * Math.PI) / items.length;
 
-        // 메뉴 아이템 (한국어)
-        const menuItems = [
-            "김치찌개", "된장찌개", "제육볶음", "비빔밥", 
-            "돈까스", "짜장면", "냉면", "초밥",
-            "부대찌개", "칼국수", "샌드위치", "파스타"
-        ];
+    function drawRoulette() {
+      for (let i = 0; i < items.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(radius, radius);
+        ctx.fillStyle = `hsl(${(i * 360) / items.length}, 70%, 70%)`;
+        ctx.arc(radius, radius, radius, i * angleStep, (i + 1) * angleStep);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(radius, radius);
+        ctx.rotate(i * angleStep + angleStep / 2);
+        ctx.fillStyle = "#000";
+        ctx.fillText(items[i], radius / 2, 0);
+        ctx.restore();
+      }
+    }
 
-        // 각 조각의 색상
-        const colors = [
-            "#FFC312", "#C4E538", "#12CBC4", "#FDA7DF", "#ED4C67",
-            "#F79F1F", "#A3CB38", "#1289A7", "#D980FA", "#B53471",
-            "#EE5A24", "#009432", "#0652DD", "#9980FA", "#833471" 
-        ];
+    function spin() {
+      const randomIndex = Math.floor(Math.random() * items.length);
+      document.getElementById("result").innerText = `오늘의 메뉴: ${items[randomIndex]}!`;
+    }
 
-        let currentRotation = 0; // 현재 캔버스 회전 각도 (GSAP에 의해 관리됨)
-        let isSpinning = false;
+    drawRoulette();
+  </script>
 
-        // 캔버스 크기 설정 (CSS에서도 roulette-container 크기 조절로 대응)
-        // JS에서 캔버스 실제 드로잉 크기를 설정해야 선명하게 그려짐
-        const canvasSize = document.querySelector('.roulette-container').clientWidth;
-        canvas.width = canvasSize;
-        canvas.height = canvasSize;
-        
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = canvas.width / 2 * 0.9; // 반지름 (여백 고려)
-
-        // 룰렛 그리기 함수
-        function drawRoulette() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
-            const numItems = menuItems.length;
-            const sliceAngle = (2 * Math.PI) / numItems; // 각 조각의 각도 (라디안)
-
-            menuItems.forEach((item, i) => {
-                const startAngle = i * sliceAngle;
-                const endAngle = (i + 1) * sliceAngle;
-
-                // 조각 그리기
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length];
-                ctx.fill();
-
-                // 테두리선 그리기 (옵션)
-                ctx.strokeStyle = "#fff"; // 흰색 테두리
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                // 텍스트 그리기
-                ctx.save();
-                ctx.translate(centerX, centerY); // 중심점으로 이동
-                // 텍스트 각도: 조각의 중간 각도
-                const textAngle = startAngle + sliceAngle / 2;
-                ctx.rotate(textAngle); // 텍스트 회전
-
-                ctx.textAlign = "right"; // 텍스트를 반지름 방향으로 정렬
-                ctx.textBaseline = "middle";
-                ctx.fillStyle = "#333"; // 텍스트 색상
-                
-                // 폰트 크기 동적 조절 (메뉴 아이템 길이에 따라)
-                const baseFontSize = radius * 0.1; // 기본 폰트 크기
-                const maxTextWidth = radius * 0.55; // 텍스트 최대 너비
-                ctx.font = `bold ${baseFontSize}px 'Nanum Gothic', sans-serif`;
-                
-                // 텍스트가 너무 길면 폰트 크기 줄이기
-                let itemText = item;
-                let textWidth = ctx.measureText(itemText).width;
-                let fontSize = baseFontSize;
-
-                while (textWidth > maxTextWidth && fontSize > 8) {
-                    fontSize -=1;
-                    ctx.font = `bold ${fontSize}px 'Nanum Gothic', sans-serif`;
-                    textWidth = ctx.measureText(itemText).width;
-                }
-                // 만약 그래도 길다면 말줄임표(...) 추가
-                if (textWidth > maxTextWidth) {
-                    let tempText = item;
-                    while (ctx.measureText(tempText + "...").width > maxTextWidth && tempText.length > 0) {
-                        tempText = tempText.slice(0, -1);
-                    }
-                    itemText = tempText + "...";
-                }
-
-                // 텍스트 위치: 반지름의 약 60% 지점
-                ctx.fillText(itemText, radius * 0.9, 0); 
-                ctx.restore(); // 이전 상태로 복원
-            });
-        }
-        
-        // 룰렛 돌리기 함수
-        spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
-            isSpinning = true;
-            spinButton.disabled = true;
-            resultDisplay.textContent = "돌아간다 돌아가~ 뱅뱅!";
-
-            const numItems = menuItems.length;
-            const winnerIndex = Math.floor(Math.random() * numItems); // 무작위 당첨 아이템 인덱스
-
-            // 목표: 당첨 아이템의 중간 지점이 포인터(상단, 270도 또는 1.5 * PI 라디안)에 오도록 회전
-            // 캔버스 좌표계: 0 라디안 = 3시 방향, 양수 각도 = 시계 방향
-            const sliceAngleRad = (2 * Math.PI) / numItems;
-            
-            // 당첨될 조각의 중간 각도 (캔버스의 초기 0도 기준)
-            const winningSliceMidRad = (winnerIndex + 0.5) * sliceAngleRad;
-            
-            // 포인터의 각도 (캔버스의 0도 기준, 12시 방향)
-            const pointerRad = 1.5 * Math.PI; // 270도
-
-            // 캔버스가 얼마나 회전해야 당첨 조각이 포인터에 올지 계산
-            // 최종적으로 캔버스의 0도 라인이 이 각도에 위치하게 됨
-            let targetRotationRad = pointerRad - winningSliceMidRad;
-            
-            // GSAP는 도(degree) 단위 사용, 현재 회전값에 더해줄 총 회전량 계산
-            // gsap.getProperty는 현재 적용된 transform 값을 가져옴
-            currentRotation = gsap.getProperty(canvas, "rotation");
-
-            // targetRotationRad를 현재 회전 상태에 상대적인 최종 각도로 변환
-            // (최종 각도 - 현재 각도)가 실제 GSAP가 회전해야 할 값이지만,
-            // GSAP에 최종 절대 각도를 주는 것이 더 직관적임.
-            // 여러 바퀴 회전을 위해 큰 값을 더함.
-            const numFullSpins = Math.floor(Math.random() * 3) + 5; // 5~7 바퀴 추가 회전
-            const finalRotationDeg = (targetRotationRad * 180 / Math.PI) + (numFullSpins * 360);
-
-            gsap.to(canvas, {
-                rotation: finalRotationDeg, // 최종 절대 회전 각도 (GSAP는 최단 경로로 가지 않도록 큰 값을 유지)
-                duration: 7, // 애니메이션 시간 (초)
-                ease: 'expo.out', // 느려지면서 멈추는 효과
-                onUpdate: function() {
-                    // GSAP 애니메이션 중 currentRotation 업데이트 (필요하다면)
-                    // currentRotation = this.target[0]._gsTransform.rotation; 
-                },
-                onComplete: () => {
-                    isSpinning = false;
-                    spinButton.disabled = false;
-                    resultDisplay.textContent = `오늘의 메뉴: ${menuItems[winnerIndex]}!`;
-                    
-                    // 정확한 최종 각도를 반영 (모듈러 연산으로 0-360 범위로 정규화)
-                    // gsap.set(canvas, {rotation: finalRotationDeg % 360}); // 다음 스핀을 위해 정규화 가능
-                }
-            });
-        });
-
-        // 초기 룰렛 그리기
-        drawRoulette();
-
-        // 창 크기 변경 시 룰렛 다시 그리기 (반응형 대응)
-        window.addEventListener('resize', () => {
-            const newSize = document.querySelector('.roulette-container').clientWidth;
-            canvas.width = newSize;
-            canvas.height = newSize;
-            // centerX, centerY, radius 업데이트
-            Object.assign(window, { // 전역 변수 업데이트
-                centerX: canvas.width / 2,
-                centerY: canvas.height / 2,
-                radius: canvas.width / 2 * 0.9
-            });
-            drawRoulette(); // 캔버스 다시 그리기
-        });
-    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('SW registered', reg))
+        .catch(err => console.error('SW registration failed', err));
+    }
+  </script>
 </body>
 </html>
