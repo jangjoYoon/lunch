@@ -9,6 +9,7 @@
         body {
             font-family: 'Nanum Gothic', 'Malgun Gothic', sans-serif;
             display: flex;
+            flex-direction: column; /* 콘텐츠를 수직으로 정렬 */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -18,7 +19,7 @@
             text-align: center;
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden; /* Confetti가 화면 밖으로 나갈 경우 스크롤 방지 */
+            overflow-x: hidden; /* 가로 스크롤 방지 */
         }
 
         .app-container {
@@ -28,11 +29,51 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 450px;
+            margin-bottom: 20px; /* 하단 여백 추가 */
         }
 
         h1 {
             color: #2c3e50;
-            margin-bottom: 25px;
+            margin-bottom: 15px; /* 여백 줄임 */
+        }
+
+        .menu-management {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* 작은 화면에서 줄바꿈 */
+        }
+
+        .menu-management input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px; /* 둥근 모서리 */
+            font-size: 0.9em;
+            flex-grow: 1; /* 가능한 공간 채우기 */
+            min-width: 150px; /* 최소 너비 */
+        }
+
+        .menu-management button {
+            padding: 10px 15px;
+            background: #2ecc71; /* 초록색 계열 */
+            color: white;
+            border: none;
+            border-radius: 20px; /* 둥근 모서리 */
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        .menu-management button:hover {
+            background: #27ae60;
+        }
+        
+        .delete-instruction {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
         }
 
         .roulette-wrapper {
@@ -45,33 +86,34 @@
 
         .roulette-container {
             position: relative;
-            width: 320px;
-            height: 320px;
+            width: 300px; /* 크기 약간 줄임 */
+            height: 300px;
         }
 
         #rouletteCanvas {
             display: block;
             border-radius: 50%;
+            cursor: pointer; /* 삭제 기능을 위해 커서 변경 */
         }
         
         #confettiCanvas {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%; /* 부모 컨테이너에 맞춤 */
+            width: 100%;
             height: 100%;
-            pointer-events: none; /* 아래 룰렛과 상호작용 가능하도록 */
-            z-index: 20; /* 포인터보다 위에, 다른 요소들보다 위에 */
+            pointer-events: none;
+            z-index: 20;
         }
 
         .pointer {
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #e74c3c;
+            border-left: 12px solid transparent; /* 크기 약간 줄임 */
+            border-right: 12px solid transparent;
+            border-top: 20px solid #e74c3c;
             position: absolute;
-            top: -10px;
+            top: -8px; /* 위치 조정 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -90,18 +132,6 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
         }
-
-        .spin-button:hover {
-            background: linear-gradient(145deg, #2980b9, #3498db);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .spin-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
         .spin-button:disabled {
             background: #bdc3c7;
             cursor: not-allowed;
@@ -123,21 +153,79 @@
             align-items: center;
             word-break: keep-all;
         }
+        
+        /* 삭제 확인 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+        }
+        .modal-content p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 0 10px;
+        }
+        .modal-buttons .confirm-delete {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .modal-buttons .cancel-delete {
+            background-color: #bdc3c7;
+            color: #333;
+        }
+
 
         @media (max-width: 480px) {
             .app-container {
                 padding: 15px;
             }
             h1 {
-                font-size: 1.8em;
+                font-size: 1.6em; /* 폰트 크기 조정 */
             }
             .roulette-container {
-                width: 280px;
-                height: 280px;
+                width: 260px; /* 모바일에서 크기 더 줄임 */
+                height: 260px;
             }
-            #rouletteCanvas { /* JS에서 설정된 크기를 CSS가 덮어쓰지 않도록 주의 */
-                 /* width: 280px !important;  이 부분은 JS에서 제어하므로 삭제 또는 주석 처리 가능 */
-                 /* height: 280px !important; */
+            .menu-management {
+                flex-direction: column; /* 모바일에서 수직 정렬 */
+            }
+            .menu-management input[type="text"] {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .menu-management button {
+                width: 100%;
             }
             .spin-button {
                 padding: 12px 25px;
@@ -152,6 +240,13 @@
 <body>
     <div class="app-container">
         <h1>점심 메뉴 룰렛</h1>
+
+        <div class="menu-management">
+            <input type="text" id="newMenuInput" placeholder="추가할 메뉴 입력">
+            <button id="addMenuButton">메뉴 추가</button>
+        </div>
+        <p class="delete-instruction">룰렛의 메뉴를 클릭하면 삭제할 수 있습니다.</p>
+
         <div class="roulette-wrapper">
             <div class="roulette-container">
                 <canvas id="rouletteCanvas"></canvas>
@@ -161,6 +256,16 @@
         </div>
         <button id="spinButton" class="spin-button">오늘 뭐 먹지?</button>
         <div id="resultDisplay" class="result-display">룰렛을 돌려주세요!</div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="deleteConfirmMessage">이 메뉴를 정말 삭제하시겠습니까?</p>
+            <div class="modal-buttons">
+                <button id="confirmDeleteButton" class="confirm-delete">예</button>
+                <button id="cancelDeleteButton" class="cancel-delete">아니오</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -173,32 +278,38 @@
         const resultDisplay = document.getElementById('resultDisplay');
         const rouletteContainer = document.querySelector('.roulette-container');
 
-        // 메뉴 아이템 (이미지 기반으로 업데이트)
-        const menuItems = [
+        const newMenuInput = document.getElementById('newMenuInput');
+        const addMenuButton = document.getElementById('addMenuButton');
+
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+        const cancelDeleteButton = document.getElementById('cancelDeleteButton');
+        let itemToDeleteIndex = -1;
+
+
+        let menuItems = [
             "제육볶음", "돈까스", "짜장면", "냉면", "초밥", "칼국수", 
             "샌드위치", "파스타", "부대찌개", "김치찌개", "된장찌개", "비빔밥"
         ];
 
-        const rouletteColors = [ // 룰렛 조각 색상
+        const rouletteColors = [ 
             "#FFC312", "#C4E538", "#12CBC4", "#FDA7DF", "#ED4C67",
             "#F79F1F", "#A3CB38", "#1289A7", "#D980FA", "#B53471",
-            "#EE5A24", "#009432" 
+            "#EE5A24", "#009432", "#0A79DF", "#4A69BD", "#6A89CC" 
         ];
         
-        const confettiColors = [ // 폭죽 색상
+        const confettiColors = [ 
             '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
             '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50',
             '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'
         ];
 
-
         let currentRotation = 0; 
         let isSpinning = false;
-        
         let centerX, centerY, radius;
         let particles = [];
         let confettiAnimationId = null;
-
 
         function setupCanvasDimensions() {
             const canvasSize = rouletteContainer.clientWidth; 
@@ -215,6 +326,21 @@
         function drawRoulette() {
             ctxRoulette.clearRect(0, 0, rouletteCanvas.width, rouletteCanvas.height); 
             const numItems = menuItems.length;
+
+            if (numItems === 0) {
+                ctxRoulette.save();
+                ctxRoulette.textAlign = "center";
+                ctxRoulette.textBaseline = "middle";
+                ctxRoulette.fillStyle = "#7f8c8d";
+                ctxRoulette.font = `bold ${radius * 0.15}px 'Nanum Gothic', sans-serif`;
+                ctxRoulette.fillText("메뉴를 추가해주세요!", centerX, centerY);
+                ctxRoulette.restore();
+                spinButton.disabled = true; // 메뉴 없으면 스핀 버튼 비활성화
+                resultDisplay.textContent = "메뉴가 없어요 :(";
+                return;
+            }
+            spinButton.disabled = false; // 메뉴 있으면 스핀 버튼 활성화
+
             const sliceAngle = (2 * Math.PI) / numItems; 
 
             menuItems.forEach((item, i) => {
@@ -241,15 +367,15 @@
                 ctxRoulette.textBaseline = "middle";
                 ctxRoulette.fillStyle = "#333"; 
                 
-                const baseFontSize = radius * 0.085; // 폰트 크기 약간 조절 (항목이 많아짐에 따라)
-                const maxTextWidth = radius * 0.60; // 텍스트 최대 너비 약간 조절
+                const baseFontSize = radius * (numItems > 10 ? 0.07 : 0.085); // 아이템 수에 따라 폰트 크기 조절
+                const maxTextWidth = radius * (numItems > 10 ? 0.55 : 0.60); 
                 ctxRoulette.font = `bold ${baseFontSize}px 'Nanum Gothic', sans-serif`;
                 
                 let itemText = item;
                 let textWidth = ctxRoulette.measureText(itemText).width;
                 let fontSize = baseFontSize;
 
-                while (textWidth > maxTextWidth && fontSize > 7) { // 최소 폰트 크기 7px
+                while (textWidth > maxTextWidth && fontSize > 6) { // 최소 폰트 크기 6px
                     fontSize -=1;
                     ctxRoulette.font = `bold ${fontSize}px 'Nanum Gothic', sans-serif`;
                     textWidth = ctxRoulette.measureText(itemText).width;
@@ -262,60 +388,140 @@
                     itemText = tempText + "...";
                 }
 
-                ctxRoulette.fillText(itemText, radius * 0.85, 0); // 텍스트 위치 약간 안쪽으로
+                ctxRoulette.fillText(itemText, radius * 0.85, 0); 
                 ctxRoulette.restore(); 
             });
         }
         
-        spinButton.addEventListener('click', () => {
+        // 메뉴 추가 로직
+        addMenuButton.addEventListener('click', () => {
             if (isSpinning) return;
+            const newMenu = newMenuInput.value.trim();
+            if (newMenu) {
+                if (menuItems.includes(newMenu)) {
+                    resultDisplay.textContent = "이미 있는 메뉴입니다!";
+                    setTimeout(() => {
+                        if (resultDisplay.textContent === "이미 있는 메뉴입니다!") {
+                           resultDisplay.textContent = menuItems.length > 0 ? "룰렛을 돌려주세요!" : "메뉴가 없어요 :(";
+                        }
+                    }, 2000);
+                    return;
+                }
+                menuItems.push(newMenu);
+                newMenuInput.value = ""; // 입력 필드 초기화
+                drawRoulette();
+                resultDisplay.textContent = `'${newMenu}' 추가 완료!`;
+            } else {
+                resultDisplay.textContent = "메뉴 이름을 입력하세요.";
+                 setTimeout(() => {
+                        if (resultDisplay.textContent === "메뉴 이름을 입력하세요.") {
+                           resultDisplay.textContent = menuItems.length > 0 ? "룰렛을 돌려주세요!" : "메뉴가 없어요 :(";
+                        }
+                    }, 2000);
+            }
+        });
+
+        // 룰렛 클릭으로 메뉴 삭제 로직
+        rouletteCanvas.addEventListener('click', (event) => {
+            if (isSpinning || menuItems.length === 0) return;
+
+            const rect = rouletteCanvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            const dx = clickX - centerX;
+            const dy = clickY - centerY;
+            const distanceFromCenter = Math.sqrt(dx * dx + dy * dy);
+
+            if (distanceFromCenter > radius) return; // 룰렛 바깥 클릭 무시
+
+            let clickAngle = Math.atan2(dy, dx); // -PI to PI, 0 at 3 o'clock
+
+            // GSAP 회전값을 라디안으로 변환 (GSAP는 degree 사용)
+            const currentCanvasRotationRad = (gsap.getProperty(rouletteCanvas, "rotation") * Math.PI / 180);
+            
+            // 클릭 각도를 룰렛의 현재 회전 상태에 맞게 조정
+            // 룰렛의 0번 조각 시작점이 화면상에 어디있는지를 기준으로 클릭 각도 보정
+            let effectiveAngle = (clickAngle - currentCanvasRotationRad + 2 * Math.PI) % (2 * Math.PI);
+            // atan2는 y축이 아래로 갈수록 양수, x축이 오른쪽으로 갈수록 양수.
+            // 캔버스 arc는 0이 3시방향, 시계방향으로 증가.
+            // effectiveAngle을 0~2PI 범위로, 0이 3시방향, 시계방향으로 증가하도록.
+            
+            const numItems = menuItems.length;
+            const sliceAngle = (2 * Math.PI) / numItems;
+            
+            itemToDeleteIndex = Math.floor(effectiveAngle / sliceAngle);
+            if (itemToDeleteIndex < 0 || itemToDeleteIndex >= numItems) return; // 혹시 모를 오류 방지
+
+            const menuItemToDelete = menuItems[itemToDeleteIndex];
+            deleteConfirmMessage.textContent = `'${menuItemToDelete}' 메뉴를 정말 삭제하시겠습니까?`;
+            deleteConfirmModal.classList.add('active');
+        });
+
+        confirmDeleteButton.addEventListener('click', () => {
+            if (itemToDeleteIndex !== -1) {
+                const deletedMenu = menuItems.splice(itemToDeleteIndex, 1)[0];
+                itemToDeleteIndex = -1;
+                drawRoulette();
+                resultDisplay.textContent = `'${deletedMenu}' 삭제 완료!`;
+            }
+            deleteConfirmModal.classList.remove('active');
+        });
+
+        cancelDeleteButton.addEventListener('click', () => {
+            itemToDeleteIndex = -1;
+            deleteConfirmModal.classList.remove('active');
+        });
+        
+        // 모달 외부 클릭 시 닫기 (선택 사항)
+        deleteConfirmModal.addEventListener('click', (event) => {
+            if (event.target === deleteConfirmModal) {
+                 itemToDeleteIndex = -1;
+                 deleteConfirmModal.classList.remove('active');
+            }
+        });
+
+
+        spinButton.addEventListener('click', () => {
+            if (isSpinning || menuItems.length === 0) return; // 메뉴 없으면 스핀 안함
             isSpinning = true;
             spinButton.disabled = true;
             resultDisplay.textContent = "돌아간다 돌아가~ 뱅뱅!";
-            if (confettiAnimationId) { // 이전 폭죽 애니메이션 정리
+            if (confettiAnimationId) { 
                 cancelAnimationFrame(confettiAnimationId);
                 ctxConfetti.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
                 particles = [];
             }
 
-
             const numItems = menuItems.length;
             const winnerIndex = Math.floor(Math.random() * numItems); 
-
             const sliceAngleRad = (2 * Math.PI) / numItems;
-            // 당첨될 조각의 중간 각도 (룰렛의 0도 기준)
             const winningSliceMidRad = (winnerIndex + 0.5) * sliceAngleRad;
-            // 포인터의 각도 (캔버스 좌표계의 12시 방향)
             const pointerRad = 1.5 * Math.PI; 
-            
-            // 룰렛의 0도 라인이 최종적으로 위치해야 할 각도 (포인터에 당첨 조각 중앙이 오도록)
             let targetOrientationRad = pointerRad - winningSliceMidRad;
             
-            currentRotation = gsap.getProperty(rouletteCanvas, "rotation"); // 현재 회전 각도 (degrees)
+            currentRotation = gsap.getProperty(rouletteCanvas, "rotation"); 
 
             let desiredAngleDeg = (targetOrientationRad * 180 / Math.PI);
-            desiredAngleDeg = (desiredAngleDeg % 360 + 360) % 360; // 0-360 사이로 정규화
+            desiredAngleDeg = (desiredAngleDeg % 360 + 360) % 360; 
 
-            const numFullSpins = Math.floor(Math.random() * 2) + 3; // 3~4 바퀴 추가 회전
+            const numFullSpins = Math.floor(Math.random() * 2) + 3; 
             let finalRotationDeg = desiredAngleDeg + numFullSpins * 360;
 
-            // 항상 앞으로 회전하도록 finalRotationDeg 조정
             while (finalRotationDeg <= currentRotation) {
                 finalRotationDeg += 360;
             }
 
             gsap.to(rouletteCanvas, {
                 rotation: finalRotationDeg, 
-                duration: 3.5, // 회전 시간 단축
+                duration: 3.5, 
                 ease: 'expo.out', 
                 onComplete: () => {
                     isSpinning = false;
-                    spinButton.disabled = false;
+                    spinButton.disabled = menuItems.length === 0; // 스핀 후에도 메뉴 수에 따라 버튼 상태 결정
                     resultDisplay.textContent = `오늘의 메뉴: ${menuItems[winnerIndex]}!`;
                     createConfettiParticles();
                     animateConfetti();
-                    // 다음 스핀을 위해 현재 회전 각도를 정규화 (선택 사항)
-                    // gsap.set(rouletteCanvas, { rotation: finalRotationDeg % 360 });
                 }
             });
         });
@@ -327,45 +533,41 @@
                 particles.push({
                     x: centerX,
                     y: centerY,
-                    size: Math.random() * 5 + 2, // 2px ~ 7px
-                    speedX: Math.random() * 10 - 5, // -5 ~ +5
-                    speedY: Math.random() * -15 + 5, // -10 ~ -15 (위로 터져나감)
+                    size: Math.random() * 5 + 2,
+                    speedX: Math.random() * 10 - 5, 
+                    speedY: Math.random() * -15 + 5, 
                     color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-                    life: 1, // 0 to 1 (1 = full life)
-                    decay: Math.random() * 0.02 + 0.01 // 0.01 ~ 0.03
+                    life: 1, 
+                    decay: Math.random() * 0.02 + 0.01 
                 });
             }
         }
 
         function animateConfetti() {
             ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-            
             particles.forEach((p, index) => {
                 p.x += p.speedX;
                 p.y += p.speedY;
-                p.speedY += 0.2; // Gravity
+                p.speedY += 0.2; 
                 p.life -= p.decay;
-
                 if (p.life <= 0) {
                     particles.splice(index, 1);
                 } else {
                     ctxConfetti.beginPath();
                     ctxConfetti.arc(p.x, p.y, p.size, 0, Math.PI * 2, false);
                     ctxConfetti.fillStyle = p.color;
-                    ctxConfetti.globalAlpha = p.life; // Fade out
+                    ctxConfetti.globalAlpha = p.life; 
                     ctxConfetti.fill();
                     ctxConfetti.closePath();
                 }
             });
-            ctxConfetti.globalAlpha = 1; // Reset globalAlpha
-
+            ctxConfetti.globalAlpha = 1; 
             if (particles.length > 0) {
                 confettiAnimationId = requestAnimationFrame(animateConfetti);
             } else {
-                ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); // 모든 파티클 사라지면 캔버스 클리어
+                ctxConfetti.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); 
             }
         }
-
 
         function initialize() {
             setupCanvasDimensions();
@@ -377,7 +579,6 @@
         window.addEventListener('resize', () => {
             setupCanvasDimensions(); 
             drawRoulette(); 
-            // 폭죽 애니메이션 중이라면, 그것도 중단하고 정리할 수 있음 (선택적)
             if (confettiAnimationId) {
                 cancelAnimationFrame(confettiAnimationId);
                 particles = [];
