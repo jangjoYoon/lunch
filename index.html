@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.png">
+<meta name="theme-color" content="#FFA500">
+
+<!-- 오픈그래프 -->
+<meta property="og:title" content="점심메뉴 추천" />
+<meta property="og:description" content="오늘 뭐 먹지? 점심메뉴 룰렛으로 간편하게 결정하세요!" />
+<meta property="og:image" content="og_image.png" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://jangjoYoon.github.io/lunch/" />
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>점심 메뉴 룰렛</title>
@@ -585,6 +597,14 @@
                 ctxConfetti.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
             }
         });
+        
+     if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered', reg))
+      .catch(err => console.error('SW registration failed', err));
+         }
+
+
     </script>
 </body>
 </html>
